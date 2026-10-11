@@ -106,37 +106,8 @@ export function DataVisualization({ chats }: DataVisualizationProps) {
     border: getThemeColor('--bolt-elements-borderColor'),
   };
 
-  const getChartColors = (index: number) => {
-    // Define color palettes based on Bolt design tokens
-    const baseColors = [
-      // Indigo
-      {
-        base: getThemeColor('--bolt-elements-button-primary-text'),
-      },
-
-      // Pink
-      {
-        base: isDarkMode ? 'rgb(244, 114, 182)' : 'rgb(236, 72, 153)',
-      },
-
-      // Green
-      {
-        base: getThemeColor('--bolt-elements-icon-success'),
-      },
-
-      // Yellow
-      {
-        base: isDarkMode ? 'rgb(250, 204, 21)' : 'rgb(234, 179, 8)',
-      },
-
-      // Blue
-      {
-        base: isDarkMode ? 'rgb(56, 189, 248)' : 'rgb(14, 165, 233)',
-      },
-    ];
-
-    // Get the base color for this index
-    const color = baseColors[index % baseColors.length].base;
+  const getChartColors = (_index: number) => {
+    const color = chartColors.textSecondary;
 
     // Parse color and generate variations with appropriate opacity
     let r = 0,
@@ -234,9 +205,7 @@ export function DataVisualization({ chats }: DataVisualizationProps) {
       tooltip: {
         titleColor: chartColors.text,
         bodyColor: chartColors.text,
-        backgroundColor: isDarkMode
-          ? 'rgba(23, 23, 23, 0.8)' // Dark bg using Tailwind gray-900
-          : 'rgba(255, 255, 255, 0.8)', // Light bg
+        backgroundColor: 'rgba(30, 30, 30, 0.9)',
         borderColor: chartColors.border,
         borderWidth: 1,
       },

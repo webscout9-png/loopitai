@@ -159,14 +159,14 @@ const NotificationsTab = () => {
   };
 
   const filterOptions: { id: FilterType; label: string; icon: string; color: string }[] = [
-    { id: 'all', label: 'All Notifications', icon: 'i-ph:bell', color: '#9333ea' },
-    { id: 'system', label: 'System', icon: 'i-ph:gear', color: '#6b7280' },
-    { id: 'update', label: 'Updates', icon: 'i-ph:arrow-circle-up', color: '#9333ea' },
-    { id: 'error', label: 'Errors', icon: 'i-ph:warning-circle', color: '#ef4444' },
-    { id: 'warning', label: 'Warnings', icon: 'i-ph:warning', color: '#f59e0b' },
-    { id: 'info', label: 'Information', icon: 'i-ph:info', color: '#3b82f6' },
-    { id: 'provider', label: 'Providers', icon: 'i-ph:robot', color: '#10b981' },
-    { id: 'network', label: 'Network', icon: 'i-ph:wifi-high', color: '#6366f1' },
+    { id: 'all', label: 'All Notifications', icon: 'i-ph:bell', color: '#A0A0A0' },
+    { id: 'system', label: 'System', icon: 'i-ph:gear', color: '#707070' },
+    { id: 'update', label: 'Updates', icon: 'i-ph:arrow-circle-up', color: '#A0A0A0' },
+    { id: 'error', label: 'Errors', icon: 'i-ph:warning-circle', color: '#707070' },
+    { id: 'warning', label: 'Warnings', icon: 'i-ph:warning', color: '#888888' },
+    { id: 'info', label: 'Information', icon: 'i-ph:info', color: '#A0A0A0' },
+    { id: 'provider', label: 'Providers', icon: 'i-ph:robot', color: '#888888' },
+    { id: 'network', label: 'Network', icon: 'i-ph:wifi-high', color: '#A0A0A0' },
   ];
 
   return (

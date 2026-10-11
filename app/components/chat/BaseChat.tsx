@@ -3,15 +3,14 @@
  * Preventing TS checks with files presented in the video for a better presentation.
  */
 import type { JSONValue, Message } from 'ai';
-import React, { type RefCallback, useEffect, useState } from 'react';
+import React, { type RefCallback, useEffect, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
 import { ClientOnly } from 'remix-utils/client-only';
 import { Menu } from '~/components/sidebar/Menu.client';
 import { Workbench } from '~/components/workbench/Workbench.client';
 import { classNames } from '~/utils/classNames';
 import { PROVIDER_LIST } from '~/utils/constants';
 import { Messages } from './Messages.client';
-import { getApiKeysFromCookies } from './APIKeyManager';
-import Cookies from 'js-cookie';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import styles from './BaseChat.module.scss';
 import { ImportButtons } from '~/components/chat/chatExportAndImport/ImportButtons';
@@ -54,6 +53,8 @@ interface BaseChatProps {
   provider?: ProviderInfo;
   setProvider?: (provider: ProviderInfo) => void;
   providerList?: ProviderInfo[];
+  apiKeys?: Record<string, string>;
+  onApiKeysChange?: (providerName: string, apiKey: string) => void;
   handleStop?: () => void;
   sendMessage?: (event: React.UIEvent, messageInput?: string) => void;
   handleInputChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
@@ -97,6 +98,8 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
       provider,
       setProvider,
       providerList,
+      apiKeys = {},
+      onApiKeysChange: notifyApiKeysChange,
       input = '',
       enhancingPrompt,
       handleInputChange,
@@ -136,9 +139,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     ref,
   ) => {
     const TEXTAREA_MAX_HEIGHT = chatStarted ? 400 : 200;
-    const [apiKeys, setApiKeys] = useState<Record<string, string>>(getApiKeysFromCookies());
     const [modelList, setModelList] = useState<ModelInfo[]>([]);
-    const [isModelSettingsCollapsed, setIsModelSettingsCollapsed] = useState(false);
     const [isListening, setIsListening] = useState(false);
     const [recognition, setRecognition] = useState<SpeechRecognition | null>(null);
     const [transcript, setTranscript] = useState('');
@@ -146,12 +147,18 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     const [progressAnnotations, setProgressAnnotations] = useState<ProgressAnnotation[]>([]);
     const expoUrl = useStore(expoUrlAtom);
     const [qrModalOpen, setQrModalOpen] = useState(false);
+    const [mobilePanel, setMobilePanel] = useState<'chat' | 'workspace'>('chat');
+    const modelListRequestId = useRef(0);
 
     useEffect(() => {
       if (expoUrl) {
         setQrModalOpen(true);
       }
     }, [expoUrl]);
+
+    useEffect(() => {
+      setMobilePanel(chatStarted ? 'workspace' : 'chat');
+    }, [chatStarted]);
 
     useEffect(() => {
       if (data) {
@@ -202,56 +209,76 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     }, []);
 
     useEffect(() => {
-      if (typeof window !== 'undefined') {
-        let parsedApiKeys: Record<string, string> | undefined = {};
+      const requestId = ++modelListRequestId.current;
 
-        try {
-          parsedApiKeys = getApiKeysFromCookies();
-          setApiKeys(parsedApiKeys);
-        } catch (error) {
-          console.error('Error loading API keys from cookies:', error);
-          Cookies.remove('apiKeys');
-        }
+      setIsModelLoading('all');
+      fetch('/api/models')
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`Failed to load models (${response.status})`);
+          }
 
-        setIsModelLoading('all');
-        fetch('/api/models')
-          .then((response) => response.json())
-          .then((data) => {
-            const typedData = data as { modelList: ModelInfo[] };
-            setModelList(typedData.modelList);
-          })
-          .catch((error) => {
-            console.error('Error fetching model list:', error);
-          })
-          .finally(() => {
+          return response.json();
+        })
+        .then((data) => {
+          if (requestId !== modelListRequestId.current) {
+            return;
+          }
+
+          const typedData = data as { modelList: ModelInfo[] };
+          setModelList(typedData.modelList);
+        })
+        .catch((error) => {
+          console.error('Error fetching model list:', error);
+          toast.error('Could not load available models');
+        })
+        .finally(() => {
+          if (requestId === modelListRequestId.current) {
             setIsModelLoading(undefined);
-          });
-      }
-    }, [providerList, provider]);
+          }
+        });
+
+      return () => {
+        if (requestId === modelListRequestId.current) {
+          modelListRequestId.current++;
+        }
+      };
+    }, [providerList]);
 
     const onApiKeysChange = async (providerName: string, apiKey: string) => {
-      const newApiKeys = { ...apiKeys, [providerName]: apiKey };
-      setApiKeys(newApiKeys);
-      Cookies.set('apiKeys', JSON.stringify(newApiKeys));
+      notifyApiKeysChange?.(providerName, apiKey);
 
+      const requestId = ++modelListRequestId.current;
       setIsModelLoading(providerName);
 
-      let providerModels: ModelInfo[] = [];
-
       try {
-        const response = await fetch(`/api/models/${encodeURIComponent(providerName)}`);
+        const response = await fetch(`/api/models/${encodeURIComponent(providerName)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ apiKey }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to load models (${response.status})`);
+        }
+
         const data = await response.json();
-        providerModels = (data as { modelList: ModelInfo[] }).modelList;
+        const providerModels = (data as { modelList: ModelInfo[] }).modelList;
+
+        if (requestId === modelListRequestId.current) {
+          setModelList((prevModels) => {
+            const otherModels = prevModels.filter((model) => model.provider !== providerName);
+            return [...otherModels, ...providerModels];
+          });
+        }
       } catch (error) {
         console.error('Error loading dynamic models for:', providerName, error);
+        toast.error(`Could not load models for ${providerName}. Check your API key and try again.`);
+      } finally {
+        if (requestId === modelListRequestId.current) {
+          setIsModelLoading(undefined);
+        }
       }
-
-      // Only update models for the specific provider
-      setModelList((prevModels) => {
-        const otherModels = prevModels.filter((model) => model.provider !== providerName);
-        return [...otherModels, ...providerModels];
-      });
-      setIsModelLoading(undefined);
     };
 
     const startListening = () => {
@@ -269,6 +296,11 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     };
 
     const handleSendMessage = (event: React.UIEvent, messageInput?: string) => {
+      if (!(providerList || (PROVIDER_LIST as ProviderInfo[])).length) {
+        toast.error('Enable an AI provider in the sidebar before starting a build.');
+        return;
+      }
+
       if (sendMessage) {
         sendMessage(event, messageInput);
         setSelectedElement?.(null);
@@ -344,19 +376,72 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     const baseChat = (
       <div
         ref={ref}
-        className={classNames(styles.BaseChat, 'relative flex h-full w-full overflow-hidden')}
+        className={classNames(
+          styles.BaseChat,
+          'relative flex h-full w-full',
+          chatStarted ? 'overflow-hidden' : 'overflow-x-hidden overflow-y-auto',
+        )}
         data-chat-visible={showChat}
       >
-        <ClientOnly>{() => <Menu />}</ClientOnly>
-        <div className="flex flex-col lg:flex-row overflow-y-auto w-full h-full">
-          <div className={classNames(styles.Chat, 'flex flex-col flex-grow lg:min-w-[var(--chat-min-width)] h-full')}>
+        <ClientOnly>
+          {() => (
+            <Menu
+              provider={provider}
+              setProvider={setProvider}
+              providerList={providerList || (PROVIDER_LIST as ProviderInfo[])}
+              model={model}
+              setModel={setModel}
+              modelList={modelList}
+              apiKeys={apiKeys}
+              onApiKeysChange={onApiKeysChange}
+              isModelLoading={isModelLoading}
+            />
+          )}
+        </ClientOnly>
+        <div
+          className={classNames(
+            'flex min-h-0 flex-1 flex-col',
+            chatStarted ? 'overflow-hidden lg:flex-row' : 'overflow-visible',
+          )}
+        >
+          {chatStarted && (
+            <div className="grid shrink-0 grid-cols-2 gap-1 border-b border-bolt-elements-borderColor bg-bolt-elements-background-depth-2 p-1 lg:hidden">
+              {(['chat', 'workspace'] as const).map((panel) => (
+                <button
+                  key={panel}
+                  type="button"
+                  aria-controls={panel === 'chat' ? 'chat-panel' : 'workspace-panel'}
+                  aria-pressed={mobilePanel === panel}
+                  onClick={() => setMobilePanel(panel)}
+                  className={classNames(
+                    'rounded-md px-3 py-2 text-sm font-medium capitalize transition-colors',
+                    mobilePanel === panel
+                      ? 'bg-bolt-elements-background-depth-3 text-bolt-elements-textPrimary'
+                      : 'text-bolt-elements-textTertiary hover:text-bolt-elements-textPrimary',
+                  )}
+                >
+                  {panel}
+                </button>
+              ))}
+            </div>
+          )}
+          <div
+            id="chat-panel"
+            className={classNames(
+              styles.Chat,
+              'flex min-h-0 min-w-0 flex-1 flex-col',
+              chatStarted && mobilePanel === 'workspace' && 'hidden lg:flex',
+              chatStarted &&
+                'border-b border-bolt-elements-borderColor lg:flex-none lg:w-[42%] lg:max-w-[480px] lg:min-w-[320px] lg:border-b-0 lg:border-r',
+            )}
+          >
             {!chatStarted && (
-              <div id="intro" className="mt-[16vh] max-w-2xl mx-auto text-center px-4 lg:px-0">
-                <h1 className="text-3xl lg:text-6xl font-bold text-bolt-elements-textPrimary mb-4 animate-fade-in">
-                  Where ideas begin
+              <div id="intro" className="mt-[10vh] mb-2 max-w-3xl mx-auto text-center px-4 lg:px-6">
+                <h1 className="text-3xl leading-tight sm:text-4xl font-medium tracking-tight text-bolt-elements-textPrimary animate-fade-in">
+                  What are we building?
                 </h1>
-                <p className="text-md lg:text-xl mb-8 text-bolt-elements-textSecondary animate-fade-in animation-delay-200">
-                  Bring ideas to life in seconds or get help on existing projects.
+                <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-bolt-elements-textTertiary animate-fade-in animation-delay-200">
+                  Describe an app, then build and refine it with Looopit.
                 </p>
               </div>
             )}
@@ -427,17 +512,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                 </div>
                 {progressAnnotations && <ProgressCompilation data={progressAnnotations} />}
                 <ChatBox
-                  isModelSettingsCollapsed={isModelSettingsCollapsed}
-                  setIsModelSettingsCollapsed={setIsModelSettingsCollapsed}
-                  provider={provider}
-                  setProvider={setProvider}
                   providerList={providerList || (PROVIDER_LIST as ProviderInfo[])}
-                  model={model}
-                  setModel={setModel}
-                  modelList={modelList}
-                  apiKeys={apiKeys}
-                  isModelLoading={isModelLoading}
-                  onApiKeysChange={onApiKeysChange}
                   uploadedFiles={uploadedFiles}
                   setUploadedFiles={setUploadedFiles}
                   imageDataList={imageDataList}
@@ -473,9 +548,14 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
             </StickToBottom>
             <div className="flex flex-col justify-center">
               {!chatStarted && (
-                <div className="flex justify-center gap-2">
-                  {ImportButtons(importChat)}
-                  <GitCloneButton importChat={importChat} />
+                <div className="mx-auto mt-1 w-full max-w-3xl px-4">
+                  <div className="mb-3 flex items-center justify-center gap-2">
+                    <span className="text-xs text-bolt-elements-textTertiary">Open an existing project</span>
+                  </div>
+                  <div className="flex flex-wrap justify-center gap-2">
+                    <ImportButtons importChat={importChat} />
+                    <GitCloneButton importChat={importChat} />
+                  </div>
                 </div>
               )}
               <div className="flex flex-col gap-5">
@@ -492,11 +572,24 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
               </div>
             </div>
           </div>
-          <ClientOnly>
-            {() => (
-              <Workbench chatStarted={chatStarted} isStreaming={isStreaming} setSelectedElement={setSelectedElement} />
+          <div
+            id="workspace-panel"
+            className={classNames(
+              'flex min-h-0 min-w-0 flex-1',
+              !chatStarted && 'hidden',
+              mobilePanel === 'chat' && chatStarted && 'hidden lg:flex',
             )}
-          </ClientOnly>
+          >
+            <ClientOnly>
+              {() => (
+                <Workbench
+                  chatStarted={chatStarted}
+                  isStreaming={isStreaming}
+                  setSelectedElement={setSelectedElement}
+                />
+              )}
+            </ClientOnly>
+          </div>
         </div>
       </div>
     );

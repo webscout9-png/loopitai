@@ -89,6 +89,7 @@ interface ModelSelectorProps {
   providerList: ProviderInfo[];
   apiKeys: Record<string, string>;
   modelLoading?: string;
+  chatStarted?: boolean;
 }
 
 // Helper function to determine if a model is likely free
@@ -114,6 +115,7 @@ export const ModelSelector = ({
   modelList,
   providerList,
   modelLoading,
+  chatStarted = false,
 }: ModelSelectorProps) => {
   const [modelSearchQuery, setModelSearchQuery] = useState('');
   const [debouncedModelSearchQuery, setDebouncedModelSearchQuery] = useState('');
@@ -544,7 +546,7 @@ export const ModelSelector = ({
 
             <div
               className={classNames(
-                'max-h-60 overflow-y-auto',
+                'max-h-[min(50vh,32rem)] min-h-24 overflow-y-auto',
                 'sm:scrollbar-none',
                 '[&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2',
                 '[&::-webkit-scrollbar-thumb]:bg-bolt-elements-borderColor',
@@ -670,7 +672,10 @@ export const ModelSelector = ({
 
         {isModelDropdownOpen && (
           <div
-            className="absolute z-10 w-full mt-1 py-1 rounded-lg border border-bolt-elements-borderColor bg-bolt-elements-background-depth-2 shadow-lg"
+            className={classNames(
+              'absolute z-10 w-full py-1 rounded-lg border border-bolt-elements-borderColor bg-bolt-elements-background-depth-2 shadow-lg',
+              chatStarted ? 'bottom-full mb-1' : 'top-full mt-1',
+            )}
             role="listbox"
             id="model-listbox"
           >
@@ -704,10 +709,10 @@ export const ModelSelector = ({
               )}
 
               {/* Search Result Count */}
-              {debouncedModelSearchQuery && filteredModels.length > 0 && (
+              {filteredModels.length > 0 && (
                 <div className="text-xs text-bolt-elements-textTertiary px-1">
-                  {filteredModels.length} model{filteredModels.length !== 1 ? 's' : ''} found
-                  {filteredModels.length > 5 && ' (showing best matches)'}
+                  {filteredModels.length} model{filteredModels.length !== 1 ? 's' : ''}{' '}
+                  {debouncedModelSearchQuery ? 'found' : 'available'}
                 </div>
               )}
 
@@ -751,7 +756,7 @@ export const ModelSelector = ({
 
             <div
               className={classNames(
-                'max-h-60 overflow-y-auto',
+                'max-h-[min(50vh,32rem)] min-h-24 overflow-y-auto',
                 'sm:scrollbar-none',
                 '[&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2',
                 '[&::-webkit-scrollbar-thumb]:bg-bolt-elements-borderColor',

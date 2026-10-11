@@ -22,13 +22,25 @@ export const Slider = genericMemo(<T,>({ selected, options, setSelected }: Slide
   const isMiddleSelected = hasMiddle && options.middle ? selected === options.middle.value : false;
 
   return (
-    <div className="flex items-center flex-wrap shrink-0 gap-1 bg-bolt-elements-background-depth-1 overflow-hidden rounded-full p-1">
-      <SliderButton selected={isLeftSelected} setSelected={() => setSelected?.(options.left.value)}>
+    <div
+      role="group"
+      aria-label="Workspace view"
+      className="flex items-center flex-wrap shrink-0 gap-0.5 bg-bolt-elements-background-depth-1 border border-bolt-elements-borderColor overflow-hidden rounded-md p-0.5"
+    >
+      <SliderButton
+        selected={isLeftSelected}
+        setSelected={() => setSelected?.(options.left.value)}
+        label={options.left.text}
+      >
         {options.left.text}
       </SliderButton>
 
       {options.middle && (
-        <SliderButton selected={isMiddleSelected} setSelected={() => setSelected?.(options.middle!.value)}>
+        <SliderButton
+          selected={isMiddleSelected}
+          setSelected={() => setSelected?.(options.middle!.value)}
+          label={options.middle.text}
+        >
           {options.middle.text}
         </SliderButton>
       )}
@@ -36,6 +48,7 @@ export const Slider = genericMemo(<T,>({ selected, options, setSelected }: Slide
       <SliderButton
         selected={!isLeftSelected && !isMiddleSelected}
         setSelected={() => setSelected?.(options.right.value)}
+        label={options.right.text}
       >
         {options.right.text}
       </SliderButton>
@@ -45,16 +58,20 @@ export const Slider = genericMemo(<T,>({ selected, options, setSelected }: Slide
 
 interface SliderButtonProps {
   selected: boolean;
+  label: string;
   children: string | JSX.Element | Array<JSX.Element | string>;
   setSelected: () => void;
 }
 
-const SliderButton = memo(({ selected, children, setSelected }: SliderButtonProps) => {
+const SliderButton = memo(({ selected, label, children, setSelected }: SliderButtonProps) => {
   return (
     <button
+      type="button"
+      aria-pressed={selected}
+      aria-label={`${label} view`}
       onClick={setSelected}
       className={classNames(
-        'bg-transparent text-sm px-2.5 py-0.5 rounded-full relative',
+        'bg-transparent text-xs sm:text-sm px-2 sm:px-2.5 py-1 rounded relative transition-colors',
         selected
           ? 'text-bolt-elements-item-contentAccent'
           : 'text-bolt-elements-item-contentDefault hover:text-bolt-elements-item-contentActive',
@@ -65,7 +82,7 @@ const SliderButton = memo(({ selected, children, setSelected }: SliderButtonProp
         <motion.span
           layoutId="pill-tab"
           transition={{ duration: 0.2, ease: cubicEasingFn }}
-          className="absolute inset-0 z-0 bg-bolt-elements-item-backgroundAccent rounded-full"
+          className="absolute inset-0 z-0 bg-bolt-elements-item-backgroundAccent rounded"
         ></motion.span>
       )}
     </button>

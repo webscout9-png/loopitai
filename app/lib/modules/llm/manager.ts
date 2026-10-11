@@ -181,7 +181,7 @@ export class LLMManager {
       })
       .catch((err) => {
         logger.error(`Error getting dynamic models ${provider.name} :`, err);
-        return [];
+        throw err;
       });
     const dynamicModelsName = dynamicModels.map((d) => d.name);
     const filteredStaticList = staticModels.filter((m) => !dynamicModelsName.includes(m.name));

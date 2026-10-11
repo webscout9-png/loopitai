@@ -127,7 +127,7 @@ export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
             }
           >
             <div className="i-ph:bug w-4 h-4 text-gray-400 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors" />
-            Report Bug
+            Upstream Bug Tracker
           </DropdownMenu.Item>
 
           <DropdownMenu.Item
@@ -166,7 +166,7 @@ export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
             onClick={() => window.open('https://stackblitz-labs.github.io/bolt.diy/', '_blank')}
           >
             <div className="i-ph:question w-4 h-4 text-gray-400 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors" />
-            Help & Documentation
+            Upstream Help & Documentation
           </DropdownMenu.Item>
         </DropdownMenu.Content>
       </DropdownMenu.Portal>

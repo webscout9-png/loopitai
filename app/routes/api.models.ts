@@ -2,7 +2,7 @@ import { json } from '@remix-run/cloudflare';
 import { LLMManager } from '~/lib/modules/llm/manager';
 import type { ModelInfo } from '~/lib/modules/llm/types';
 import type { ProviderInfo } from '~/types/model';
-import { getApiKeysFromCookie, getProviderSettingsFromCookie } from '~/lib/api/cookies';
+import { getProviderSettingsFromCookie } from '~/lib/api/cookies';
 
 interface ModelsResponse {
   modelList: ModelInfo[];
@@ -53,9 +53,8 @@ export async function loader({
 }): Promise<Response> {
   const llmManager = LLMManager.getInstance(context.cloudflare?.env);
 
-  // Get client side maintained API keys and provider settings from cookies
+  // API keys are supplied explicitly only to requests that need dynamic models.
   const cookieHeader = request.headers.get('Cookie');
-  const apiKeys = getApiKeysFromCookie(cookieHeader);
   const providerSettings = getProviderSettingsFromCookie(cookieHeader);
 
   const { providers, defaultProvider } = getProviderInfo(llmManager);
@@ -68,7 +67,6 @@ export async function loader({
 
     if (provider) {
       modelList = await llmManager.getModelListFromProvider(provider, {
-        apiKeys,
         providerSettings,
         serverEnv: context.cloudflare?.env,
       });
@@ -76,7 +74,6 @@ export async function loader({
   } else {
     // Update all models
     modelList = await llmManager.updateModelList({
-      apiKeys,
       providerSettings,
       serverEnv: context.cloudflare?.env,
     });

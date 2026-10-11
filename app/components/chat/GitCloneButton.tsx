@@ -55,6 +55,7 @@ export default function GitCloneButton({ importChat, className }: GitCloneButton
 
   const handleClone = async (repoUrl: string) => {
     if (!ready) {
+      toast.info('The browser workspace is still starting. Please try again in a moment.');
       return;
     }
 
@@ -163,6 +164,7 @@ ${escapeBoltTags(file.content)}
   return (
     <>
       <Button
+        type="button"
         onClick={() => {
           setSelectedProvider(null);
           setIsDialogOpen(true);
@@ -179,13 +181,15 @@ ${escapeBoltTags(file.content)}
           'transition-all duration-200 ease-in-out',
           className,
         )}
-        disabled={!ready || loading}
+        disabled={loading}
       >
-        Clone a repo
-        <div className="flex items-center gap-1 ml-2">
-          <Github className="w-4 h-4" />
-          <GitBranch className="w-4 h-4" />
-        </div>
+        {loading ? 'Cloning…' : ready ? 'Clone a repo' : 'Preparing workspace…'}
+        {!loading && (
+          <div className="flex items-center gap-1 ml-2">
+            <Github className="w-4 h-4" />
+            <GitBranch className="w-4 h-4" />
+          </div>
+        )}
       </Button>
 
       {/* Provider Selection Dialog */}

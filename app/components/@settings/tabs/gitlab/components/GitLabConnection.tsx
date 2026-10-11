@@ -160,8 +160,8 @@ export default function GitLabConnection({ connectionTest, onTestConnection }: G
                   disabled={isConnecting || !token.trim()}
                   className={classNames(
                     'px-4 py-2 rounded-lg text-sm flex items-center gap-2',
-                    'bg-[#FC6D26] text-white',
-                    'hover:bg-[#E24329] hover:text-white',
+                    'bg-[#707070] text-white',
+                    'hover:bg-[#888888] hover:text-white',
                     'disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200',
                     'transform active:scale-95',
                   )}

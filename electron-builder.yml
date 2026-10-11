@@ -1,5 +1,5 @@
-appId: com.stackblitz.bolt.diy
-productName: Bolt Local
+appId: app.loopit.desktop
+productName: Loopit
 directories:
   buildResources: build
   output: dist

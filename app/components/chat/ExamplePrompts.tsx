@@ -1,37 +1,41 @@
 import React from 'react';
 
 const EXAMPLE_PROMPTS = [
-  { text: 'Create a mobile app about bolt.diy' },
-  { text: 'Build a todo app in React using Tailwind' },
-  { text: 'Build a simple blog using Astro' },
-  { text: 'Create a cookie consent form using Material UI' },
-  { text: 'Make a space invaders game' },
-  { text: 'Make a Tic Tac Toe game in html, css and js only' },
+  { text: 'Create a mobile app landing page for a productivity startup', icon: 'i-ph:device-mobile' },
+  { text: 'Build a todo app in React using Tailwind', icon: 'i-ph:check-square' },
+  { text: 'Build a simple blog using Astro', icon: 'i-ph:article' },
+  { text: 'Create a cookie consent form using Material UI', icon: 'i-ph:cookie' },
+  { text: 'Make a space invaders game', icon: 'i-ph:game-controller' },
+  { text: 'Make a Tic Tac Toe game in html, css and js only', icon: 'i-ph:circles-three' },
 ];
 
 export function ExamplePrompts(sendMessage?: { (event: React.UIEvent, messageInput?: string): void | undefined }) {
   return (
-    <div id="examples" className="relative flex flex-col gap-9 w-full max-w-3xl mx-auto flex justify-center mt-6">
-      <div
-        className="flex flex-wrap justify-center gap-2"
-        style={{
-          animation: '.25s ease-out 0s 1 _fade-and-move-in_g2ptj_1 forwards',
-        }}
-      >
-        {EXAMPLE_PROMPTS.map((examplePrompt, index: number) => {
+    <section id="examples" aria-label="Example prompts" className="relative mx-auto mt-5 mb-8 w-full max-w-3xl px-4">
+      <div className="mb-3 flex items-center gap-3">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.16em] text-bolt-elements-textTertiary">
+          Start with an idea
+        </h2>
+        <span className="h-px flex-1 bg-bolt-elements-borderColor" />
+      </div>
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        {EXAMPLE_PROMPTS.map((examplePrompt) => {
           return (
             <button
-              key={index}
+              key={examplePrompt.text}
               onClick={(event) => {
                 sendMessage?.(event, examplePrompt.text);
               }}
-              className="border border-bolt-elements-borderColor rounded-full bg-gray-50 hover:bg-gray-100 dark:bg-gray-950 dark:hover:bg-gray-900 text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary px-3 py-1 text-xs transition-theme"
+              className="group flex min-h-12 items-center gap-3 rounded-md border border-bolt-elements-borderColor bg-bolt-elements-background-depth-2 px-3 py-2 text-left text-xs leading-relaxed text-bolt-elements-textSecondary transition-colors hover:border-accent-500/50 hover:bg-bolt-elements-background-depth-3 hover:text-bolt-elements-textPrimary"
             >
-              {examplePrompt.text}
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-bolt-elements-background-depth-3 text-bolt-elements-textTertiary transition-colors group-hover:text-accent-400">
+                <span aria-hidden="true" className={`${examplePrompt.icon} text-lg`} />
+              </span>
+              <span>{examplePrompt.text}</span>
             </button>
           );
         })}
       </div>
-    </div>
+    </section>
   );
 }

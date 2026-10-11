@@ -34,12 +34,17 @@ export function useGit() {
   const [fs, setFs] = useState<PromiseFsClient>();
   const fileData = useRef<Record<string, { data: any; encoding?: string }>>({});
   useEffect(() => {
-    webcontainerPromise.then((container) => {
-      fileData.current = {};
-      setWebcontainer(container);
-      setFs(getFs(container, fileData));
-      setReady(true);
-    });
+    webcontainerPromise
+      .then((container) => {
+        fileData.current = {};
+        setWebcontainer(container);
+        setFs(getFs(container, fileData));
+        setReady(true);
+      })
+      .catch((error) => {
+        console.error('Failed to initialize the browser workspace for Git operations:', error);
+        toast.error('The browser workspace could not be initialized. Reload the page and try again.');
+      });
   }, []);
 
   const gitClone = useCallback(
@@ -65,7 +70,7 @@ export function useGit() {
       const headers: {
         [x: string]: string;
       } = {
-        'User-Agent': 'bolt.diy',
+        'User-Agent': 'Loopit',
       };
 
       const auth = lookupSavedPassword(url);

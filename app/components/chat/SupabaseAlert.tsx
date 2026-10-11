@@ -99,13 +99,13 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
         transition={{ duration: 0.3 }}
-        className="max-w-chat rounded-lg border-l-2 border-l-[#098F5F] border border-bolt-elements-borderColor bg-bolt-elements-background-depth-2"
+        className="max-w-chat rounded-lg border-l-2 border-l-[#888888] border border-bolt-elements-borderColor bg-bolt-elements-background-depth-2"
       >
         {/* Header */}
         <div className="p-4 pb-2">
           <div className="flex items-center gap-2">
             <img height="10" width="18" crossOrigin="anonymous" src="https://cdn.simpleicons.org/supabase" />
-            <h3 className="text-sm font-medium text-[#3DCB8F]">{title}</h3>
+            <h3 className="text-sm font-medium text-[#A0A0A0]">{title}</h3>
           </div>
         </div>
 
@@ -151,8 +151,8 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
                 onClick={handleConnectClick}
                 className={classNames(
                   `px-3 py-2 rounded-md text-sm font-medium`,
-                  'bg-[#098F5F]',
-                  'hover:bg-[#0aa06c]',
+                  'bg-[#707070]',
+                  'hover:bg-[#888888]',
                   'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500',
                   'text-white',
                   'flex items-center gap-1.5',
@@ -166,8 +166,8 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
                 disabled={isExecuting}
                 className={classNames(
                   `px-3 py-2 rounded-md text-sm font-medium`,
-                  'bg-[#098F5F]',
-                  'hover:bg-[#0aa06c]',
+                  'bg-[#707070]',
+                  'hover:bg-[#888888]',
                   'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500',
                   'text-white',
                   'flex items-center gap-1.5',
@@ -182,10 +182,10 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
               disabled={isExecuting}
               className={classNames(
                 `px-3 py-2 rounded-md text-sm font-medium`,
-                'bg-[#503B26]',
-                'hover:bg-[#774f28]',
+                'bg-[#363636]',
+                'hover:bg-[#464646]',
                 'focus:outline-none',
-                'text-[#F79007]',
+                'text-[#A0A0A0]',
                 isExecuting ? 'opacity-70 cursor-not-allowed' : '',
               )}
             >

@@ -126,7 +126,7 @@ export function SupabaseConnection() {
                       'bg-[#F8F8F8] dark:bg-[#1A1A1A]',
                       'border border-[#E5E5E5] dark:border-[#333333]',
                       'text-bolt-elements-textPrimary placeholder-bolt-elements-textTertiary',
-                      'focus:outline-none focus:ring-1 focus:ring-[#3ECF8E]',
+                      'focus:outline-none focus:ring-1 focus:ring-[#A0A0A0]',
                       'disabled:opacity-50',
                     )}
                   />
@@ -135,7 +135,7 @@ export function SupabaseConnection() {
                       href="https://app.supabase.com/account/tokens"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[#3ECF8E] hover:underline inline-flex items-center gap-1"
+                      className="text-[#A0A0A0] hover:underline inline-flex items-center gap-1"
                     >
                       Get your token
                       <div className="i-ph:arrow-square-out w-4 h-4" />
@@ -152,8 +152,8 @@ export function SupabaseConnection() {
                     disabled={connecting || !supabaseConn.token}
                     className={classNames(
                       'px-4 py-2 rounded-lg text-sm flex items-center gap-2',
-                      'bg-[#3ECF8E] text-white',
-                      'hover:bg-[#3BBF84]',
+                      'bg-[#707070] text-white',
+                      'hover:bg-[#888888]',
                       'disabled:opacity-50 disabled:cursor-not-allowed',
                     )}
                   >
@@ -225,7 +225,7 @@ export function SupabaseConnection() {
                         </button>
                         <button
                           onClick={() => handleCreateProject()}
-                          className="px-2 py-1 rounded-md text-xs bg-[#3ECF8E] text-white hover:bg-[#3BBF84] flex items-center gap-1"
+                          className="px-2 py-1 rounded-md text-xs bg-[#707070] text-white hover:bg-[#888888] flex items-center gap-1"
                         >
                           <div className="i-ph:plus w-3 h-3" />
                           New Project
@@ -246,12 +246,12 @@ export function SupabaseConnection() {
                             {supabaseConn.stats.projects.map((project) => (
                               <div
                                 key={project.id}
-                                className="block p-3 rounded-lg border border-[#E5E5E5] dark:border-[#1A1A1A] hover:border-[#3ECF8E] dark:hover:border-[#3ECF8E] transition-colors"
+                                className="block p-3 rounded-lg border border-[#E5E5E5] dark:border-[#1A1A1A] hover:border-[#888888] dark:hover:border-[#888888] transition-colors"
                               >
                                 <div className="flex items-center justify-between">
                                   <div>
                                     <h5 className="text-sm font-medium text-bolt-elements-textPrimary flex items-center gap-1">
-                                      <div className="i-ph:database w-3 h-3 text-[#3ECF8E]" />
+                                      <div className="i-ph:database w-3 h-3 text-[#888888]" />
                                       {project.name}
                                     </h5>
                                     <div className="text-xs text-bolt-elements-textSecondary mt-1">
@@ -263,8 +263,8 @@ export function SupabaseConnection() {
                                     className={classNames(
                                       'px-3 py-1 rounded-md text-xs',
                                       supabaseConn.selectedProjectId === project.id
-                                        ? 'bg-[#3ECF8E] text-white'
-                                        : 'bg-[#F0F0F0] dark:bg-[#252525] text-bolt-elements-textSecondary hover:bg-[#3ECF8E] hover:text-white',
+                                        ? 'bg-[#707070] text-white'
+                                        : 'bg-[#F0F0F0] dark:bg-[#252525] text-bolt-elements-textSecondary hover:bg-[#888888] hover:text-white',
                                     )}
                                   >
                                     {supabaseConn.selectedProjectId === project.id ? (

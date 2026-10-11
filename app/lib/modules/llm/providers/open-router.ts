@@ -59,7 +59,15 @@ export default class OpenRouterProvider extends BaseProvider {
         },
       });
 
+      if (!response.ok) {
+        throw new Error(`OpenRouter model request failed (${response.status})`);
+      }
+
       const data = (await response.json()) as OpenRouterModelsResponse;
+
+      if (!Array.isArray(data.data)) {
+        throw new Error('OpenRouter returned an invalid model list');
+      }
 
       return data.data
         .sort((a, b) => a.name.localeCompare(b.name))
@@ -80,7 +88,7 @@ export default class OpenRouterProvider extends BaseProvider {
         });
     } catch (error) {
       console.error('Error getting OpenRouter models:', error);
-      return [];
+      throw error;
     }
   }
 

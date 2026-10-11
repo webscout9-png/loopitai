@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import type { Message } from 'ai';
 import { toast } from 'react-toastify';
 import { MAX_FILES, isBinaryFile, shouldIncludeFile } from '~/utils/fileUtils';
@@ -14,8 +14,16 @@ interface ImportFolderButtonProps {
 
 export const ImportFolderButton: React.FC<ImportFolderButtonProps> = ({ className, importChat }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const folderInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!importChat) {
+      toast.error('Chat import is unavailable right now.');
+      e.target.value = '';
+
+      return;
+    }
+
     const allFiles = Array.from(e.target.files || []);
 
     const filteredFiles = allFiles.filter((file) => {
@@ -106,8 +114,8 @@ export const ImportFolderButton: React.FC<ImportFolderButtonProps> = ({ classNam
   return (
     <>
       <input
+        ref={folderInputRef}
         type="file"
-        id="folder-import"
         className="hidden"
         webkitdirectory=""
         directory=""
@@ -115,9 +123,9 @@ export const ImportFolderButton: React.FC<ImportFolderButtonProps> = ({ classNam
         {...({} as any)}
       />
       <Button
+        type="button"
         onClick={() => {
-          const input = document.getElementById('folder-import');
-          input?.click();
+          folderInputRef.current?.click();
         }}
         title="Import Folder"
         variant="default"
@@ -131,7 +139,7 @@ export const ImportFolderButton: React.FC<ImportFolderButtonProps> = ({ classNam
           'transition-all duration-200 ease-in-out',
           className,
         )}
-        disabled={isLoading}
+        disabled={!importChat || isLoading}
       >
         <span className="i-ph:upload-simple w-4 h-4" />
         {isLoading ? 'Importing...' : 'Import Folder'}

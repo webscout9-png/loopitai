@@ -117,6 +117,31 @@ export const ChatImpl = memo(
     const [selectedElement, setSelectedElement] = useState<ElementInfo | null>(null);
     const mcpSettings = useMCPStore((state) => state.settings);
 
+    useEffect(() => {
+      const storedApiKeys = Cookies.get('apiKeys');
+
+      if (!storedApiKeys) {
+        return;
+      }
+
+      try {
+        const savedKeys = JSON.parse(storedApiKeys) as Record<string, string>;
+        const providerNames = new Set(PROVIDER_LIST.map(({ name }) => name));
+        const integrationKeys = Object.fromEntries(
+          Object.entries(savedKeys).filter(([key]) => !providerNames.has(key)),
+        );
+
+        if (Object.keys(integrationKeys).length > 0) {
+          Cookies.set('apiKeys', JSON.stringify(integrationKeys));
+        } else {
+          Cookies.remove('apiKeys');
+        }
+      } catch (error) {
+        console.error('Failed to clear legacy AI provider keys from cookies:', error);
+        Cookies.remove('apiKeys');
+      }
+    }, []);
+
     const {
       messages,
       isLoading,
@@ -328,6 +353,7 @@ export const ChatImpl = memo(
         animate('#intro', { opacity: 0, flex: 1 }, { duration: 0.2, ease: cubicEasingFn }),
       ]);
 
+      workbenchStore.currentView.set('preview');
       chatStore.setKey('started', true);
 
       setChatStarted(true);
@@ -398,6 +424,8 @@ export const ChatImpl = memo(
         return;
       }
 
+      setLlmErrorAlert(undefined);
+
       let finalMessageContent = messageContent;
 
       if (selectedElement) {
@@ -413,14 +441,22 @@ export const ChatImpl = memo(
         setFakeLoading(true);
 
         if (autoSelectTemplate) {
-          const { template, title } = await selectStarterTemplate({
-            message: finalMessageContent,
-            model,
-            provider,
-          });
+          let selectedTemplate: Awaited<ReturnType<typeof selectStarterTemplate>> | undefined;
 
-          if (template !== 'blank') {
-            const temResp = await getTemplates(template, title).catch((e) => {
+          try {
+            selectedTemplate = await selectStarterTemplate({
+              message: finalMessageContent,
+              model,
+              provider,
+              apiKeys,
+            });
+          } catch (error) {
+            logger.warn('Starter template selection failed; continuing with a blank project', error);
+            toast.warning('Could not select a starter template. Continuing with a blank project.');
+          }
+
+          if (selectedTemplate && selectedTemplate.template !== 'blank') {
+            const temResp = await getTemplates(selectedTemplate.template, selectedTemplate.title).catch((e) => {
               if (e.message.includes('rate limit')) {
                 toast.warning('Rate limit exceeded. Skipping starter template\n Continuing with blank template');
               } else {
@@ -576,14 +612,6 @@ export const ChatImpl = memo(
       [],
     );
 
-    useEffect(() => {
-      const storedApiKeys = Cookies.get('apiKeys');
-
-      if (storedApiKeys) {
-        setApiKeys(JSON.parse(storedApiKeys));
-      }
-    }, []);
-
     const handleModelChange = (newModel: string) => {
       setModel(newModel);
       Cookies.set('selectedModel', newModel, { expires: 30 });
@@ -627,6 +655,20 @@ export const ChatImpl = memo(
         provider={provider}
         setProvider={handleProviderChange}
         providerList={activeProviders}
+        apiKeys={apiKeys}
+        onApiKeysChange={(providerName, apiKey) => {
+          setApiKeys((currentKeys) => {
+            const updatedKeys = { ...currentKeys };
+
+            if (apiKey) {
+              updatedKeys[providerName] = apiKey;
+            } else {
+              delete updatedKeys[providerName];
+            }
+
+            return updatedKeys;
+          });
+        }}
         handleInputChange={(e) => {
           onTextareaChange(e);
           debouncedCachePrompt(e);

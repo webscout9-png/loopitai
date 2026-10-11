@@ -21,43 +21,43 @@ const logLevelOptions: SelectOption[] = [
     value: 'all',
     label: 'All Types',
     icon: 'i-ph:funnel',
-    color: '#9333ea',
+    color: '#A0A0A0',
   },
   {
     value: 'provider',
     label: 'LLM',
     icon: 'i-ph:robot',
-    color: '#10b981',
+    color: '#888888',
   },
   {
     value: 'api',
     label: 'API',
     icon: 'i-ph:cloud',
-    color: '#3b82f6',
+    color: '#A0A0A0',
   },
   {
     value: 'error',
     label: 'Errors',
     icon: 'i-ph:warning-circle',
-    color: '#ef4444',
+    color: '#707070',
   },
   {
     value: 'warning',
     label: 'Warnings',
     icon: 'i-ph:warning',
-    color: '#f59e0b',
+    color: '#888888',
   },
   {
     value: 'info',
     label: 'Info',
     icon: 'i-ph:info',
-    color: '#3b82f6',
+    color: '#A0A0A0',
   },
   {
     value: 'debug',
     label: 'Debug',
     icon: 'i-ph:bug',
-    color: '#6b7280',
+    color: '#707070',
   },
 ];
 
@@ -492,27 +492,27 @@ export function EventLogsTab() {
           yPos = margin;
         }
 
-        doc.setFillColor('#F3F4F6');
+        doc.setFillColor('#292929');
         doc.rect(margin - 2, yPos - 5, pageWidth - 2 * (margin - 2), lineHeight + 6, 'F');
         doc.setFont('helvetica', 'bold');
-        doc.setTextColor('#111827');
+        doc.setTextColor('#D0D0D0');
         doc.setFontSize(12);
         doc.text(title.toUpperCase(), margin, yPos);
         yPos += lineHeight * 2;
       };
 
       // Add title and header
-      doc.setFillColor('#6366F1');
+      doc.setFillColor('#292929');
       doc.rect(0, 0, pageWidth, 50, 'F');
-      doc.setTextColor('#FFFFFF');
+      doc.setTextColor('#D0D0D0');
       doc.setFontSize(24);
       doc.setFont('helvetica', 'bold');
       doc.text('Event Logs Report', margin, 35);
 
-      // Add subtitle with bolt.diy
+      // Add the Loopit product name
       doc.setFontSize(12);
       doc.setFont('helvetica', 'normal');
-      doc.text('bolt.diy - AI Development Platform', margin, 45);
+      doc.text('Loopit - AI Development Platform', margin, 45);
       yPos = 70;
 
       // Add report summary section
@@ -520,7 +520,7 @@ export function EventLogsTab() {
 
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-      doc.setTextColor('#374151');
+      doc.setTextColor('#A0A0A0');
 
       const summaryItems = [
         { label: 'Generated', value: new Date().toLocaleString() },
@@ -555,15 +555,15 @@ export function EventLogsTab() {
 
       // Create two columns for statistics
       const leftStats = [
-        { label: 'Error Logs', value: stats.error, color: '#DC2626' },
-        { label: 'Warning Logs', value: stats.warning, color: '#F59E0B' },
-        { label: 'Info Logs', value: stats.info, color: '#3B82F6' },
+        { label: 'Error Logs', value: stats.error, color: '#888888' },
+        { label: 'Warning Logs', value: stats.warning, color: '#A0A0A0' },
+        { label: 'Info Logs', value: stats.info, color: '#A0A0A0' },
       ];
 
       const rightStats = [
-        { label: 'Debug Logs', value: stats.debug, color: '#6B7280' },
-        { label: 'LLM Logs', value: stats.provider, color: '#10B981' },
-        { label: 'API Logs', value: stats.api, color: '#3B82F6' },
+        { label: 'Debug Logs', value: stats.debug, color: '#707070' },
+        { label: 'LLM Logs', value: stats.provider, color: '#888888' },
+        { label: 'API Logs', value: stats.api, color: '#A0A0A0' },
       ];
 
       const colWidth = (pageWidth - 2 * margin) / 2;
@@ -573,7 +573,7 @@ export function EventLogsTab() {
         doc.setTextColor(stat.color);
         doc.setFont('helvetica', 'bold');
         doc.text(stat.value.toString(), margin, yPos);
-        doc.setTextColor('#374151');
+        doc.setTextColor('#A0A0A0');
         doc.setFont('helvetica', 'normal');
         doc.text(stat.label, margin + 20, yPos);
 
@@ -581,7 +581,7 @@ export function EventLogsTab() {
           doc.setTextColor(rightStats[index].color);
           doc.setFont('helvetica', 'bold');
           doc.text(rightStats[index].value.toString(), margin + colWidth, yPos);
-          doc.setTextColor('#374151');
+          doc.setTextColor('#A0A0A0');
           doc.setFont('helvetica', 'normal');
           doc.text(rightStats[index].label, margin + colWidth + 20, yPos);
         }
@@ -617,31 +617,31 @@ export function EventLogsTab() {
 
         // Draw log level badge background
         const levelColors: Record<string, string> = {
-          error: '#FEE2E2',
-          warning: '#FEF3C7',
-          info: '#DBEAFE',
-          debug: '#F3F4F6',
+          error: '#363636',
+          warning: '#363636',
+          info: '#363636',
+          debug: '#363636',
         };
 
         const textColors: Record<string, string> = {
-          error: '#DC2626',
-          warning: '#F59E0B',
-          info: '#3B82F6',
-          debug: '#6B7280',
+          error: '#A0A0A0',
+          warning: '#A0A0A0',
+          info: '#A0A0A0',
+          debug: '#707070',
         };
 
         const levelWidth = doc.getTextWidth(log.level.toUpperCase()) + 10;
-        doc.setFillColor(levelColors[log.level] || '#F3F4F6');
+        doc.setFillColor(levelColors[log.level] || '#363636');
         doc.roundedRect(margin, yPos - 4, levelWidth, lineHeight + 4, 1, 1, 'F');
 
         // Add log level text
-        doc.setTextColor(textColors[log.level] || '#6B7280');
+        doc.setTextColor(textColors[log.level] || '#707070');
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(8);
         doc.text(log.level.toUpperCase(), margin + 5, yPos);
 
         // Add timestamp
-        doc.setTextColor('#6B7280');
+        doc.setTextColor('#707070');
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(9);
         doc.text(timestamp, margin + levelWidth + 10, yPos);
@@ -649,18 +649,18 @@ export function EventLogsTab() {
         // Add category if present
         if (log.category) {
           const categoryX = margin + levelWidth + doc.getTextWidth(timestamp) + 20;
-          doc.setFillColor('#F3F4F6');
+          doc.setFillColor('#363636');
 
           const categoryWidth = doc.getTextWidth(log.category) + 10;
           doc.roundedRect(categoryX, yPos - 4, categoryWidth, lineHeight + 4, 2, 2, 'F');
-          doc.setTextColor('#6B7280');
+          doc.setTextColor('#707070');
           doc.text(log.category, categoryX + 5, yPos);
         }
 
         yPos += lineHeight * 1.5;
 
         // Add message
-        doc.setTextColor('#111827');
+        doc.setTextColor('#D0D0D0');
         doc.setFontSize(10);
 
         const messageLines = doc.splitTextToSize(log.message, maxLineWidth - 10);
@@ -669,14 +669,14 @@ export function EventLogsTab() {
 
         // Add details if present
         if (log.details) {
-          doc.setTextColor('#6B7280');
+          doc.setTextColor('#707070');
           doc.setFontSize(8);
 
           const detailsStr = JSON.stringify(log.details, null, 2);
           const detailsLines = doc.splitTextToSize(detailsStr, maxLineWidth - 15);
 
           // Add details background
-          doc.setFillColor('#F9FAFB');
+          doc.setFillColor('#292929');
           doc.roundedRect(margin + 5, yPos - 2, maxLineWidth - 10, detailsLines.length * lineHeight + 8, 1, 1, 'F');
 
           doc.text(detailsLines, margin + 10, yPos + 4);
@@ -684,7 +684,7 @@ export function EventLogsTab() {
         }
 
         // Add separator line
-        doc.setDrawColor('#E5E7EB');
+        doc.setDrawColor('#464646');
         doc.setLineWidth(0.1);
         doc.line(margin, yPos, pageWidth - margin, yPos);
         yPos += lineHeight * 1.5;
@@ -701,7 +701,7 @@ export function EventLogsTab() {
       for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
         doc.setFontSize(8);
-        doc.setTextColor('#9CA3AF');
+        doc.setTextColor('#888888');
 
         // Add page numbers
         doc.text(`Page ${i} of ${totalPages}`, pageWidth / 2, doc.internal.pageSize.getHeight() - 10, {
@@ -709,7 +709,7 @@ export function EventLogsTab() {
         });
 
         // Add footer text
-        doc.text('Generated by bolt.diy', margin, doc.internal.pageSize.getHeight() - 10);
+        doc.text('Generated by Loopit', margin, doc.internal.pageSize.getHeight() - 10);
 
         const dateStr = new Date().toLocaleDateString();
         doc.text(dateStr, pageWidth - margin, doc.internal.pageSize.getHeight() - 10, { align: 'right' });

@@ -1,15 +1,12 @@
 {
-  "name": "bolt",
-  "description": "An AI Agent",
+  "name": "loopit",
+  "description": "An open-source, browser-based AI app builder",
   "private": true,
   "license": "MIT",
   "sideEffects": false,
   "type": "module",
   "version": "1.0.0",
-  "author": {
-    "name": "bolt.diy team",
-    "email": "maintainers@bolt.diy"
-  },
+  "author": "Loopit contributors",
   "scripts": {
     "deploy": "npm run build && wrangler pages deploy",
     "build": "remix vite:build",
@@ -22,9 +19,9 @@
     "start:unix": "bindings=$(./bindings.sh) && wrangler pages dev ./build/client $bindings",
     "start": "node -e \"const { spawn } = require('child_process'); const isWindows = process.platform === 'win32'; const cmd = isWindows ? 'npm run start:windows' : 'npm run start:unix'; const child = spawn(cmd, { shell: true, stdio: 'inherit' }); child.on('exit', code => process.exit(code));\"",
     "dockerstart": "bindings=$(./bindings.sh) && wrangler pages dev ./build/client $bindings --ip 0.0.0.0 --port 5173 --no-show-interactive-dev-session",
-    "dockerrun": "docker run -it -d --name bolt-ai-live -p 5173:5173 --env-file .env.local bolt-ai",
-    "dockerbuild:prod": "docker build -t bolt-ai:production -t bolt-ai:latest --target bolt-ai-production .",
-    "dockerbuild": "docker build -t bolt-ai:development -t bolt-ai:latest --target development .",
+    "dockerrun": "docker run -it -d --name loopit-live -p 5173:5173 --env-file .env.local loopit",
+    "dockerbuild:prod": "docker build -t loopit:production -t loopit:latest --target loopit-production .",
+    "dockerbuild": "docker build -t loopit:development -t loopit:latest --target development .",
     "typecheck": "tsc",
     "typegen": "wrangler types",
     "preview": "pnpm run build && pnpm run start",

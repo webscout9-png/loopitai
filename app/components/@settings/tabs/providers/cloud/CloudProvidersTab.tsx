@@ -292,7 +292,7 @@ const CloudProvidersTab = () => {
               <motion.div
                 className="absolute inset-0 border-2 border-purple-500/0 rounded-lg pointer-events-none"
                 animate={{
-                  borderColor: provider.settings.enabled ? 'rgba(168, 85, 247, 0.2)' : 'rgba(168, 85, 247, 0)',
+                  borderColor: provider.settings.enabled ? 'rgba(136, 136, 136, 0.2)' : 'rgba(136, 136, 136, 0)',
                   scale: provider.settings.enabled ? 1 : 0.98,
                 }}
                 transition={{ duration: 0.2 }}

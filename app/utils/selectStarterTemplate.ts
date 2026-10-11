@@ -82,12 +82,18 @@ const parseSelectedTemplate = (llmOutput: string): { template: string; title: st
   }
 };
 
-export const selectStarterTemplate = async (options: { message: string; model: string; provider: ProviderInfo }) => {
-  const { message, model, provider } = options;
+export const selectStarterTemplate = async (options: {
+  message: string;
+  model: string;
+  provider: ProviderInfo;
+  apiKeys?: Record<string, string>;
+}) => {
+  const { message, model, provider, apiKeys } = options;
   const requestBody = {
     message,
     model,
     provider,
+    apiKeys,
     system: starterTemplateSelectionPrompt(templates),
   };
   const response = await fetch('/api/llmcall', {
@@ -184,7 +190,7 @@ export async function getTemplates(templateName: string, title?: string) {
   }
 
   const assistantMessage = `
-Bolt is initializing your project with the required files using the ${template.name} template.
+Loopit is initializing your project with the required files using the ${template.name} template.
 <boltArtifact id="imported-files" title="${title || 'Create initial files'}" type="bundled">
 ${filesToImport.files
   .map(

@@ -84,10 +84,15 @@ export const EditorPanel = memo(
       <PanelGroup direction="vertical">
         <Panel defaultSize={showTerminal ? DEFAULT_EDITOR_SIZE : 100} minSize={20}>
           <PanelGroup direction="horizontal">
-            <Panel defaultSize={20} minSize={15} collapsible className="border-r border-bolt-elements-borderColor">
+            <Panel
+              defaultSize={20}
+              minSize={15}
+              collapsible
+              className="border-r border-bolt-elements-borderColor bg-bolt-elements-background-depth-2"
+            >
               <div className="h-full">
                 <Tabs.Root defaultValue="files" className="flex flex-col h-full">
-                  <PanelHeader className="w-full text-sm font-medium text-bolt-elements-textSecondary px-1">
+                  <PanelHeader className="w-full text-sm font-medium text-bolt-elements-textSecondary px-2">
                     <div className="h-full flex-shrink-0 flex items-center justify-between w-full">
                       <Tabs.List className="h-full flex-shrink-0 flex items-center">
                         <Tabs.Trigger
@@ -144,7 +149,7 @@ export const EditorPanel = memo(
 
             <PanelResizeHandle />
             <Panel className="flex flex-col" defaultSize={80} minSize={20}>
-              <PanelHeader className="overflow-x-auto">
+              <PanelHeader className="overflow-x-auto bg-bolt-elements-background-depth-2">
                 {activeFileSegments?.length && (
                   <div className="flex items-center flex-1 text-sm">
                     <FileBreadcrumb pathSegments={activeFileSegments} files={files} onFileSelect={onFileSelect} />
@@ -163,7 +168,7 @@ export const EditorPanel = memo(
                   </div>
                 )}
               </PanelHeader>
-              <div className="h-full flex-1 overflow-hidden modern-scrollbar">
+              <div className="h-full flex-1 overflow-hidden modern-scrollbar bg-bolt-elements-background-depth-1">
                 <CodeMirrorEditor
                   theme={theme}
                   editable={!isStreaming && editorDocument !== undefined}

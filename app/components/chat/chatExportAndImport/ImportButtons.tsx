@@ -1,20 +1,27 @@
 import type { Message } from 'ai';
+import { useRef } from 'react';
 import { toast } from 'react-toastify';
 import { ImportFolderButton } from '~/components/chat/ImportFolderButton';
 import { Button } from '~/components/ui/Button';
 import { classNames } from '~/utils/classNames';
 
 type ChatData = {
-  messages?: Message[]; // Standard Bolt format
+  messages?: Message[]; // Standard chat export format
   description?: string; // Optional description
 };
 
-export function ImportButtons(importChat: ((description: string, messages: Message[]) => Promise<void>) | undefined) {
+interface ImportButtonsProps {
+  importChat: ((description: string, messages: Message[]) => Promise<void>) | undefined;
+}
+
+export function ImportButtons({ importChat }: ImportButtonsProps) {
+  const chatImportRef = useRef<HTMLInputElement>(null);
+
   return (
     <div className="flex flex-col items-center justify-center w-auto">
       <input
+        ref={chatImportRef}
         type="file"
-        id="chat-import"
         className="hidden"
         accept=".json"
         onChange={async (e) => {
@@ -31,8 +38,12 @@ export function ImportButtons(importChat: ((description: string, messages: Messa
 
                   // Standard format
                   if (Array.isArray(data.messages)) {
-                    await importChat(data.description || 'Imported Chat', data.messages);
-                    toast.success('Chat imported successfully');
+                    try {
+                      await importChat(data.description || 'Imported Chat', data.messages);
+                      toast.success('Chat imported successfully');
+                    } catch (error: unknown) {
+                      toast.error(error instanceof Error ? error.message : 'Failed to import chat');
+                    }
 
                     return;
                   }
@@ -60,9 +71,9 @@ export function ImportButtons(importChat: ((description: string, messages: Messa
       <div className="flex flex-col items-center gap-4 max-w-2xl text-center">
         <div className="flex gap-2">
           <Button
+            type="button"
             onClick={() => {
-              const input = document.getElementById('chat-import');
-              input?.click();
+              chatImportRef.current?.click();
             }}
             variant="default"
             size="lg"
@@ -74,6 +85,7 @@ export function ImportButtons(importChat: ((description: string, messages: Messa
               'h-10 px-4 py-2 min-w-[120px] justify-center',
               'transition-all duration-200 ease-in-out',
             )}
+            disabled={!importChat}
           >
             <span className="i-ph:upload-simple w-4 h-4" />
             Import Chat

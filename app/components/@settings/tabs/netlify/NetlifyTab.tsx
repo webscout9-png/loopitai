@@ -1213,7 +1213,7 @@ export default function NetlifyTab() {
         transition={{ delay: 0.1 }}
       >
         <div className="flex items-center gap-2">
-          <div className="text-[#00AD9F]">
+          <div className="text-[#888888]">
             <NetlifyLogo />
           </div>
           <h2 className="text-lg font-medium text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary">
@@ -1345,7 +1345,7 @@ export default function NetlifyTab() {
                   className={classNames(
                     'px-4 py-2 rounded-lg text-sm flex items-center gap-2',
                     'bg-[#303030] text-white',
-                    'hover:bg-[#5E41D0] hover:text-white',
+                    'hover:bg-[#888888] hover:text-white',
                     'disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200',
                     'transform active:scale-95',
                   )}

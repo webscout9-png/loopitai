@@ -195,18 +195,15 @@ export class ActionRunner {
                 return;
               }
 
-              this.#updateAction(actionId, { status: 'failed', error: 'Action failed' });
+              const message = err instanceof Error ? err.message : String(err);
+              const commandError = err instanceof ActionCommandError ? err : undefined;
+              this.#updateAction(actionId, { status: 'failed', error: message });
               logger.error(`[${action.type}]:Action failed\n\n`, err);
-
-              if (!(err instanceof ActionCommandError)) {
-                return;
-              }
-
               this.onAlert?.({
                 type: 'error',
-                title: 'Dev Server Failed',
-                description: err.header,
-                content: err.output,
+                title: commandError ? 'Dev Server Failed' : 'Project Action Failed',
+                description: commandError?.header || message,
+                content: commandError?.output || '',
               });
             });
 
@@ -228,22 +225,21 @@ export class ActionRunner {
         return;
       }
 
-      this.#updateAction(actionId, { status: 'failed', error: 'Action failed' });
+      const message = error instanceof Error ? error.message : String(error);
+      this.#updateAction(actionId, { status: 'failed', error: message });
       logger.error(`[${action.type}]:Action failed\n\n`, error);
 
-      if (!(error instanceof ActionCommandError)) {
-        return;
-      }
-
+      const commandError = error instanceof ActionCommandError ? error : undefined;
       this.onAlert?.({
         type: 'error',
-        title: 'Dev Server Failed',
-        description: error.header,
-        content: error.output,
+        title: commandError ? 'Dev Server Failed' : 'Project Action Failed',
+        description: commandError?.header || message,
+        content: commandError?.output || '',
       });
 
-      // re-throw the error to be caught in the promise chain
-      throw error;
+      if (commandError) {
+        throw commandError;
+      }
     }
   }
 
@@ -327,6 +323,9 @@ export class ActionRunner {
         logger.debug('Created folder', folder);
       } catch (error) {
         logger.error('Failed to create folder\n\n', error);
+        throw new Error(
+          `Failed to create project directory "${folder}": ${error instanceof Error ? error.message : String(error)}`,
+        );
       }
     }
 
@@ -335,6 +334,9 @@ export class ActionRunner {
       logger.debug(`File written ${relativePath}`);
     } catch (error) {
       logger.error('Failed to write file\n\n', error);
+      throw new Error(
+        `Failed to write project file "${relativePath}": ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   }
 

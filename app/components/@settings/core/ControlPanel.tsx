@@ -12,7 +12,6 @@ import type { TabType, Profile } from './types';
 import { TAB_LABELS, DEFAULT_TAB_CONFIG, TAB_DESCRIPTIONS } from './constants';
 import { DialogTitle } from '~/components/ui/Dialog';
 import { AvatarDropdown } from './AvatarDropdown';
-import BackgroundRays from '~/components/ui/BackgroundRays';
 
 // Import all tab components
 import ProfileTab from '~/components/@settings/tabs/profile/ProfileTab';
@@ -237,7 +236,7 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
               className={classNames(
                 'w-[1200px] h-[90vh]',
                 'bg-bolt-elements-background-depth-1',
-                'rounded-2xl shadow-2xl',
+                'rounded-lg shadow-2xl',
                 'border border-bolt-elements-borderColor',
                 'flex flex-col overflow-hidden',
                 'relative',
@@ -245,9 +244,6 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
                 open ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-4',
               )}
             >
-              <div className="absolute inset-0 overflow-hidden rounded-2xl">
-                <BackgroundRays />
-              </div>
               <div className="relative z-10 flex flex-col h-full">
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">

@@ -84,8 +84,7 @@ export const Artifact = memo(({ artifactId }: ArtifactProps) => {
           <button
             className="flex items-stretch bg-bolt-elements-artifacts-background hover:bg-bolt-elements-artifacts-backgroundHover w-full overflow-hidden"
             onClick={() => {
-              const showWorkbench = workbenchStore.showWorkbench.get();
-              workbenchStore.showWorkbench.set(!showWorkbench);
+              workbenchStore.currentView.set('code');
             }}
           >
             <div className="px-5 p-3.5 w-full text-left">
@@ -94,7 +93,7 @@ export const Artifact = memo(({ artifactId }: ArtifactProps) => {
                 {dynamicTitle}
               </div>
               <div className="w-full w-full text-bolt-elements-textSecondary text-xs mt-0.5">
-                Click to open Workbench
+                Open generated code in the workspace
               </div>
             </div>
           </button>
@@ -256,6 +255,9 @@ const ActionList = memo(({ actions }: ActionListProps) => {
                   </a>
                 ) : null}
               </div>
+              {action.status === 'failed' && (
+                <p className="mt-1 text-xs text-bolt-elements-icon-error">{action.error}</p>
+              )}
               {(type === 'shell' || type === 'start') && (
                 <ShellCodeBlock
                   classsName={classNames('mt-1', {
