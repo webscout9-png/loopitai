@@ -1,6 +1,7 @@
 import ignore from 'ignore';
 import type { ProviderInfo } from '~/types/model';
 import type { Template } from '~/types/template';
+import { getGameStarterTemplate } from '~/lib/common/prompts/game-build-guidance';
 import { STARTER_TEMPLATES } from './constants';
 
 const starterTemplateSelectionPrompt = (templates: Template[]) => `
@@ -60,7 +61,7 @@ Instructions:
 5. If no perfect match exists, recommend the closest option
 
 Important: Provide only the selection tags in your response, no additional text.
-MOST IMPORTANT: YOU DONT HAVE TIME TO THINK JUST START RESPONDING BASED ON HUNCH 
+Choose the best match based on the user's actual requirements. If no template is a clear fit, choose blank rather than guessing.
 `;
 
 const templates: Template[] = STARTER_TEMPLATES.filter((t) => !t.name.includes('shadcn'));
@@ -89,6 +90,12 @@ export const selectStarterTemplate = async (options: {
   apiKeys?: Record<string, string>;
 }) => {
   const { message, model, provider, apiKeys } = options;
+  const gameStarterTemplate = getGameStarterTemplate(message);
+
+  if (gameStarterTemplate) {
+    return gameStarterTemplate;
+  }
+
   const requestBody = {
     message,
     model,

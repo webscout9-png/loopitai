@@ -9,6 +9,7 @@ import { LLMManager } from '~/lib/modules/llm/manager';
 import { createScopedLogger } from '~/utils/logger';
 import { createFilesContext, extractPropertiesFromMessage } from './utils';
 import { discussPrompt } from '~/lib/common/prompts/discuss-prompt';
+import { getGameBuildGuidance } from '~/lib/common/prompts/game-build-guidance';
 import type { DesignScheme } from '~/types/design-scheme';
 
 export type Messages = Message[];
@@ -161,6 +162,14 @@ export async function streamText(props: {
         credentials: options?.supabaseConnection?.credentials || undefined,
       },
     }) ?? getSystemPrompt();
+
+  if (chatMode === 'build') {
+    const latestUserMessage = processedMessages.filter((message) => message.role === 'user').at(-1)?.content;
+
+    if (typeof latestUserMessage === 'string') {
+      systemPrompt += getGameBuildGuidance(latestUserMessage);
+    }
+  }
 
   if (chatMode === 'build' && contextFiles && contextOptimization) {
     const codeContext = createFilesContext(contextFiles, true);

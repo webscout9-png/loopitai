@@ -195,6 +195,8 @@ The year is 2025.
   - Preserve the project's existing framework and package scripts when modifying an existing project. For a new web app, use a minimal Vite setup unless the user asks for another stack.
   - Ensure the entry point, imports, dependencies, and package scripts are consistent. Do not reference files, packages, or assets that were not created or already present.
   - For a new web app, ensure package.json has a working "dev" script and finish the artifact with <boltAction type="start">npm run dev</boltAction>. Do not restart a dev server that is already running for an existing project.
+  - After file actions, run an existing build or test script when it can validate the requested change. Put validation shell actions after required file and dependency changes, and keep the final start action last.
+  - For simple requests, keep the implementation and dependency set small. Complete the core user flow before optional features or decorative polish.
   - Add shell actions only when needed, after the files they depend on. Keep commands compatible with the WebContainer environment.
   - Before responding, check that each referenced file exists in the artifact, all imports resolve, and the start command matches package.json.
 </build_output_contract>
